@@ -1,7 +1,7 @@
 -- Create a stored procedure to add a bonus correction
 DROP PROCEDURE IF EXISTS AddBonus; 
 DELIMITER $$
-CREATE PROCEDURE AddBonus(IN user_id INT, IN project_name VARCHAR(255), IN score INT)
+CREATE PROCEDURE AddBonus(user_id INT, project_name VARCHAR(255), score FLOAT)
 BEGIN
     DECLARE project_count INT DEFAULT 0;
     DECLARE project_id INT DEFAULT 0;
