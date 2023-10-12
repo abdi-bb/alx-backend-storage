@@ -1,6 +1,6 @@
 -- AFTER INSERT trigger
 -- Create a trigger to decrease the quantity of items after adding an order
-DROP TRIGGER IF EXISTS decrease_quantity_after_order
+DROP TRIGGER IF EXISTS decrease_quantity_after_order;
 DELIMITER $$
 CREATE TRIGGER decrease_quantity_after_order
 AFTER INSERT ON orders
