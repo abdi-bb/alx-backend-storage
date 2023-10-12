@@ -1,4 +1,6 @@
 -- Create a stored procedure to compute and store the average weighted score for all users
+DROP PROCEDURE IF EXISTS ComputeAverageWeightedScoreForUsers;
+
 DELIMITER $$
 CREATE PROCEDURE ComputeAverageWeightedScoreForUsers()
 BEGIN
