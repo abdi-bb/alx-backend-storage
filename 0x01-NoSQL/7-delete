@@ -1,0 +1,2 @@
+// cript that deletes all documents with name="Holberton school".
+db.school.remove({ name: 'Holberton school' });
