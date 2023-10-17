@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
+'''
+Module: '12-log_stats'
+'''
 
 from pymongo import MongoClient
 
 
 def log_stats():
+    '''Provides nginx stats'''
     client = MongoClient('mongodb://127.0.0.1:27017')
     db = client.logs
     collection = db.nginx
