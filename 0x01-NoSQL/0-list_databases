@@ -1,2 +1,2 @@
-// MongoDb script that shows all dbs
+// MongoDb script that shows all dbs.
 show dbs;
