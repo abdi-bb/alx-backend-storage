@@ -20,7 +20,7 @@ def get_page(url: str) -> str:
         # If the count key exists, increment the count
         redis_client.incr(count_key)
     else:
-        # If the count key doesn't exist, set it to 1 with a 10-second expiration
+        # If the count key doesn't exist, set it to 1 with a 10-seconds
         redis_client.setex(count_key, 10, 1)
 
     # Use the requests library to fetch the HTML content of the URL
