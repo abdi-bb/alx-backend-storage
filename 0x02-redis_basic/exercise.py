@@ -6,7 +6,7 @@ Class named 'Cache'
 
 import redis
 from uuid import uuid4
-from typing import Union
+from typing import Union, Callable
 
 
 class Cache():
@@ -22,3 +22,18 @@ class Cache():
         key = str(uuid4())
         self._redis.set(key, data)
         return key
+
+    def get(self, key: str, fn: Callable = None) -> Union[str, bytes, int, float, None]:
+        '''Converts data back to the desired format'''
+        data = self._redis.get(key)
+        if data is not None and fn is not None:
+            return fn(data)
+        return data
+
+    def get_str(self, key: str) -> str:
+        '''Returns str from a given data'''
+        return self.get(key, fn=lambda d: d.decode('utf-8'))
+
+    def get_int(self, key: str) -> int:
+        '''Returns int'''
+        return self.get(key, fn=lambda d: int(d))
