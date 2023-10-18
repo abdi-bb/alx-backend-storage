@@ -14,26 +14,32 @@ redis_client = redis.Redis()
 
 
 def data_cacher(method: Callable) -> Callable:
-    '''Caches the output of fetched data.
+    '''Caches the output of fetched data and tracks the request count.
     '''
     @wraps(method)
-    def wrapper(url) -> str:
-        '''The wrapper function for caching the output.
+    def wrapper(url: str) -> str:
+        '''Wrapper for caching and tracking.
         '''
-        redis_client.incr(f'count:{url}')
-        result = redis_client.get(f'result:{url}')
-        if result:
-            return result.decode('utf-8')
+        count_key = f'count:{url}'
+        result_key = f'result:{url}'
+
+        redis_client.incr(count_key)
+        cached_result = redis_client.get(result_key)
+
+        if cached_result:
+            return cached_result.decode('utf-8')
+
         result = method(url)
-        redis_client.set(f'count:{url}', 0)
-        redis_client.setex(f'result:{url}', 10, result)
+
+        redis_client.set(count_key, 0)
+        redis_client.setex(result_key, 10, result)
+
         return result
     return wrapper
 
 
 @data_cacher
 def get_page(url: str) -> str:
-    '''Returns the content of a URL after caching the request's response,
-    and tracking the request.
+    '''Returns the content of a URL after caching and tracking the request.
     '''
     return requests.get(url).text
