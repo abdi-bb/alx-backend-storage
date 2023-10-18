@@ -71,3 +71,19 @@ class Cache():
     def get_int(self, key: str) -> int:
         '''Returns int'''
         return self.get(key, fn=lambda d: int(d))
+
+
+def replay(fn: Callable) -> None:
+    '''Get the function's qualified name to find the input and output lists'''
+    method_name = fn.__qualname__
+    input_list_key = f"{method_name}:inputs"
+    output_list_key = f"{method_name}:outputs"
+
+    # Retrieve the input and output lists from Redis
+    inputs = cache._redis.lrange(input_list_key, 0, -1)
+    outputs = cache._redis.lrange(output_list_key, 0, -1)
+
+    # Print the history of calls with their inputs and outputs
+    print(f"{method_name} was called {len(inputs)} times:")
+    for args, output in zip(inputs, outputs):
+        print(f"{method_name}(*{eval(args.decode())}) -> {output.decode()}")
