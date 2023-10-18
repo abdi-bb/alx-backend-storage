@@ -5,27 +5,35 @@ Module: 'web'
 
 import requests
 import redis
-from typing import Optional
+from functools import wraps
+from typing import Callable
+
 
 # Initialize the Redis connection
 redis_client = redis.Redis()
 
 
+def data_cacher(method: Callable) -> Callable:
+    '''Caches the output of fetched data.
+    '''
+    @wraps(method)
+    def invoker(url) -> str:
+        '''The wrapper function for caching the output.
+        '''
+        redis_store.incr(f'count:{url}')
+        result = redis_store.get(f'result:{url}')
+        if result:
+            return result.decode('utf-8')
+        result = method(url)
+        redis_store.set(f'count:{url}', 0)
+        redis_store.setex(f'result:{url}', 10, result)
+        return result
+    return invoker
+
+
+@data_cacher
 def get_page(url: str) -> str:
-    '''Define the key for tracking URL access count'''
-    count_key = f"count:{url}"
-
-    # Check if the count key exists in Redis
-    if redis_client.exists(count_key):
-        # If the count key exists, increment the count
-        redis_client.incr(count_key)
-    else:
-        # If the count key doesn't exist, set it to 1 with a 10-seconds
-        redis_client.setex(count_key, 10, 1)
-
-    # Use the requests library to fetch the HTML content of the URL
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.text
-    else:
-        return f"Failed to fetch URL: {url}"
+    '''Returns the content of a URL after caching the request's response,
+    and tracking the request.
+    '''
+    return requests.get(url).text
