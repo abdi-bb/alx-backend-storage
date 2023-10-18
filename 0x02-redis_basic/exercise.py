@@ -6,17 +6,17 @@ Class named 'Cache'
 
 import redis
 from uuid import uuid4
-from typing import Union, Callable
+from typing import Union, Callable, Any
 from functools import wraps
 
 
-def count_calls(method: Callable):
+def count_calls(method: Callable) -> Callable:
+    '''Counts the number of calls to class Cache'''
     @wraps(method)
-    def wrapper(self, *args, **kwargs):
-        key = method.__qualname__  # Use the qualified name of the method as the key
-        count = int(self._redis.get(key) or 0)
-        count += 1
-        self._redis.set(key, count)
+    def wrapper(self, *args, **kwargs) -> Any:
+        '''Calls the given method after incrementing call counter'''
+        if isinstance(self._redis, redis.Redis):
+            self._redis.incr(method.__qualname__)
         return method(self, *args, **kwargs)
     return wrapper
 
